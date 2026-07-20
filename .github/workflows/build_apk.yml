@@ -24,11 +24,9 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Safe Project Check
+      - name: Generate Android Folder Safely
         run: |
-          if [ ! -f "pubspec.yaml" ]; then
-            flutter create . --org=com.aura.agent
-          fi
+          flutter create . --platforms=android --org=com.aura.agent
 
       - name: Get Dependencies
         run: flutter pub get
