@@ -24,10 +24,10 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Create Android Structure
+      - name: Safe Project Check
         run: |
-          if [ ! -d "android" ]; then
-            flutter create . --platforms=android --org=com.aura.agent --overwrite
+          if [ ! -f "pubspec.yaml" ]; then
+            flutter create . --org=com.aura.agent
           fi
 
       - name: Get Dependencies
