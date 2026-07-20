@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(const UltimateDatingApp());
@@ -80,36 +79,13 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
   int _affection = 10; 
   String _status = "Yabancı 👤"; 
   final List<Map<String, String>> _chatHistory = [];
-  final FlutterTts _tts = FlutterTts();
 
   List<Map<String, dynamic>> _currentOptions = [];
 
   @override
   void initState() {
     super.initState();
-    _initTts();
     _loadStage1();
-  }
-
-  void _initTts() async {
-    await _tts.setLanguage("tr-TR");
-    await _tts.setSpeechRate(0.88);
-  }
-
-  void _speak(String text) {
-    _tts.speak(text);
-  }
-
-  void _updateStatus() {
-    if (_affection < 25) {
-      _status = "Yabancı 👤";
-    } else if (_affection < 55) {
-      _status = "Arkadaş ☕";
-    } else if (_affection < 80) {
-      _status = "Flört 🔥";
-    } else {
-      _status = "Sevgili ❤️ (Özel Mod Aktif)";
-    }
   }
 
   void _loadStage1() {
@@ -128,19 +104,25 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
         "reply": "Hemen mi? 😂 Çok hızlı gittin, ben o kadar kolay boyun eğmem."
       }
     ];
-
-    _speak(startMsg);
   }
 
   void _makeChoice(Map<String, dynamic> option) {
     setState(() {
       _chatHistory.add({"sender": "user", "text": option["text"]});
       _affection = (_affection + (option["delta"] as int)).clamp(0, 100);
-      _updateStatus();
+      
+      if (_affection < 25) {
+        _status = "Yabancı 👤";
+      } else if (_affection < 55) {
+        _status = "Arkadaş ☕";
+      } else if (_affection < 80) {
+        _status = "Flört 🔥";
+      } else {
+        _status = "Sevgili ❤️ (Özel Mod Aktif)";
+      }
 
       String replyText = option["reply"];
       _chatHistory.add({"sender": "aura", "text": replyText});
-      _speak(replyText);
 
       _loadNextOptions();
     });
@@ -385,7 +367,7 @@ class PhotoAlbumScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF171328),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF7B3FA0), width: 1),
+              border: Border.all(color: Color(0xFF7B3FA0), width: 1),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
