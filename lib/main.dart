@@ -108,7 +108,7 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
     } else if (_affection < 80) {
       _status = "Flört 🔥";
     } else {
-      _status = "Sevgili ❤️ (+18 Mod Aktif)";
+      _status = "Sevgili ❤️ (Özel Mod Aktif)";
     }
   }
 
@@ -168,7 +168,7 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
         {
           "text": "Artık aramızdaki bu çekime daha fazla dayanamıyorum, benim ol.",
           "delta": 20,
-          "reply": "Dayanmana gerek kalmadı... Kazandın beni. Artık resmi olarak sevgiliniz ve her şeyinleyim. 🔥"
+          "reply": "Dayanmana gerek kalmadı... Kazandın beni. Artık resmi olarak sevgilin ve her şeyinleyim. 🔥"
         }
       ];
     } else {
@@ -198,7 +198,6 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
       ),
       body: Column(
         children: [
-          // Gelişmiş Şık Durum Çubuğu
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: const BoxDecoration(
@@ -227,7 +226,6 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
               ],
             ),
           ),
-          // Sohbet Alanı
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(12),
@@ -272,7 +270,6 @@ class _DatingSimScreenState extends State<DatingSimScreen> {
               },
             ),
           ),
-          // Seçenek Butonları Paneli
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
