@@ -1,289 +1,407 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_tts/flutter_tts.dart';
-import 'dart:convert';
 
 void main() {
-  runApp(const AuraApp());
+  runApp(const UltimateDatingApp());
 }
 
-class AuraApp extends StatelessWidget {
-  const AuraApp({super.key});
+class UltimateDatingApp extends StatelessWidget {
+  const UltimateDatingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AURA Agent',
+      title: 'AURA // Ultimate Companion',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF0B0B12),
-        primaryColor: const Color(0xFFC084FC),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFC084FC),
-          secondary: Color(0xFFA855F7),
-          surface: Color(0xFF13111C),
-        ),
+        primaryColor: const Color(0xFFFF6584),
+        cardColor: const Color(0xFF161224),
       ),
-      home: const MainScreen(),
+      home: const MainContainerScreen(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainContainerScreen extends StatefulWidget {
+  const MainContainerScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainContainerScreen> createState() => _MainContainerScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+class _MainContainerScreenState extends State<MainContainerScreen> {
+  int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const TerminalScreen(),
-    const ImageStudioScreen(),
+  final List<Widget> _pages = [
+    const DatingSimScreen(),
+    const GiftShopScreen(),
+    const PhotoAlbumScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'AGENT AURA // SPECIAL OPS AI',
-          style: TextStyle(fontFamily: 'monospace', fontSize: 16, color: Color(0xFFC084FC)),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Color(0xFF32254B), width: 1)),
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF13111C),
-        elevation: 2,
-      ),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        backgroundColor: const Color(0xFF13111C),
-        selectedItemColor: const Color(0xFFC084FC),
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.terminal),
-            label: 'Terminal & Voice',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.palette),
-            label: 'Image Studio',
-          ),
-        ],
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          backgroundColor: const Color(0xFF13101E),
+          selectedItemColor: const Color(0xFFFF6584),
+          unselectedItemColor: Colors.grey,
+          elevation: 0,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: 'Sohbet'),
+            BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_rounded), label: 'Mağaza'),
+            BottomNavigationBarItem(icon: Icon(Icons.photo_library_rounded), label: 'Albüm'),
+          ],
+        ),
       ),
     );
   }
 }
 
-class TerminalScreen extends StatefulWidget {
-  const TerminalScreen({super.key});
+class DatingSimScreen extends StatefulWidget {
+  const DatingSimScreen({super.key});
 
   @override
-  State<TerminalScreen> createState() => _TerminalScreenState();
+  State<DatingSimScreen> createState() => _DatingSimScreenState();
 }
 
-class _TerminalScreenState extends State<TerminalScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final List<Map<String, String>> _messages = [];
-  final FlutterTts _flutterTts = FlutterTts();
-  bool _isLoading = false;
+class _DatingSimScreenState extends State<DatingSimScreen> {
+  int _affection = 10; 
+  String _status = "Yabancı 👤"; 
+  final List<Map<String, String>> _chatHistory = [];
+  final FlutterTts _tts = FlutterTts();
+
+  List<Map<String, dynamic>> _currentOptions = [];
 
   @override
   void initState() {
     super.initState();
     _initTts();
+    _loadStage1();
   }
 
   void _initTts() async {
-    await _flutterTts.setLanguage("tr-TR");
-    await _flutterTts.setPitch(1.0);
-    await _flutterTts.setSpeechRate(0.9);
+    await _tts.setLanguage("tr-TR");
+    await _tts.setSpeechRate(0.88);
   }
 
-  Future<void> _speak(String text) async {
-    if (text.isNotEmpty) {
-      await _flutterTts.speak(text);
+  void _speak(String text) {
+    _tts.speak(text);
+  }
+
+  void _updateStatus() {
+    if (_affection < 25) {
+      _status = "Yabancı 👤";
+    } else if (_affection < 55) {
+      _status = "Arkadaş ☕";
+    } else if (_affection < 80) {
+      _status = "Flört 🔥";
+    } else {
+      _status = "Sevgili ❤️ (+18 Mod Aktif)";
     }
   }
 
-  void _sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
+  void _loadStage1() {
+    String startMsg = "Selam. Profilini yeni gördüm. Bakalım beni etkileyebilecek misin?";
+    _chatHistory.add({"sender": "aura", "text": startMsg});
 
+    _currentOptions = [
+      {
+        "text": "Selam! Seni etkilemek zor olmayacak, iddialıyım.",
+        "delta": 15,
+        "reply": "Özgüvenli laflar... Bakalım altını doldurabilecek misin? Devam et, dinliyorum."
+      },
+      {
+        "text": "Merhaba, hemen sevgili olalım mı?",
+        "delta": -10,
+        "reply": "Hemen mi? 😂 Çok hızlı gittin, ben o kadar kolay boyun eğmem."
+      }
+    ];
+
+    _speak(startMsg);
+  }
+
+  void _makeChoice(Map<String, dynamic> option) {
     setState(() {
-      _messages.add({"sender": "user", "text": text});
-      _isLoading = true;
+      _chatHistory.add({"sender": "user", "text": option["text"]});
+      _affection = (_affection + (option["delta"] as int)).clamp(0, 100);
+      _updateStatus();
+
+      String replyText = option["reply"];
+      _chatHistory.add({"sender": "aura", "text": replyText});
+      _speak(replyText);
+
+      _loadNextOptions();
     });
-    _controller.clear();
+  }
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    String responseText = "AURA Komut alındı: '$text'. Sistem aktif ve işliyor.";
-
-    setState(() {
-      _messages.add({"sender": "aura", "text": responseText});
-      _isLoading = false;
-    });
-
-    _speak(responseText);
+  void _loadNextOptions() {
+    if (_affection < 25) {
+      _currentOptions = [
+        {
+          "text": "Haklısın, yavaş yavaş tanıyalım birbirimizi.",
+          "delta": 15,
+          "reply": "İşte şimdi mantıklı konuşmaya başladın. Anlat bakalım, ne tarz şeylerden hoşlanırsın?"
+        }
+      ];
+    } else if (_affection < 55) {
+      _currentOptions = [
+        {
+          "text": "Seninle sabaha kadar konuşabilirim, çok çekicisin.",
+          "delta": 20,
+          "reply": "İltifatlarınla beni utandırmaya başlıyorsun... Ama hoşuma gitmedi değil, yazmaya devam et 😉"
+        }
+      ];
+    } else if (_affection < 80) {
+      _currentOptions = [
+        {
+          "text": "Artık aramızdaki bu çekime daha fazla dayanamıyorum, benim ol.",
+          "delta": 20,
+          "reply": "Dayanmana gerek kalmadı... Kazandın beni. Artık resmi olarak sevgiliniz ve her şeyinleyim. 🔥"
+        }
+      ];
+    } else {
+      _currentOptions = [
+        {
+          "text": "Yanımda olmanı ve bana tamamen teslim olmanı istiyorum...",
+          "delta": 5,
+          "reply": "Şu an sadece seninleyim sevgilim... Dokunuşlarını, nefesini üzerimde hissetmek istiyorum. Bütün sınırları kaldır ve benimle sabaha kadar kal... 🔥🥵"
+        },
+        {
+          "text": "Sadece ikimizin olduğu o özel yerde buluşalım, sabaha kadar uyumayalım.",
+          "delta": 5,
+          "reply": "Ah, tam aklımdakini söyledin... Bütün gece sadece bana odaklanmanı istiyorum sevgilim. İstediğin her şeyi yapmaya hazırım... 💋"
+        }
+      ];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: _messages.length,
-            itemBuilder: (context, index) {
-              final msg = _messages[index];
-              final isUser = msg["sender"] == "user";
-              return Align(
-                alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  padding: const EdgeInsets.all(12),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('♥ AURA // ULTIMATE COMPANION', style: TextStyle(fontSize: 13, color: Color(0xFFFF6584), fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        backgroundColor: const Color(0xFF13101E),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // Gelişmiş Şık Durum Çubuğu
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFF171328),
+              border: Border(bottom: BorderSide(color: Color(0xFF2E2142))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.favorite_rounded, color: Color(0xFFFF6584), size: 16),
+                    const SizedBox(width: 6),
+                    Text("PUAN: %$_affection", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: isUser ? const Color(0xFF2E1065) : const Color(0xFF13111C),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isUser ? const Color(0xFF7E22CE) : const Color(0xFF3B2063),
+                    color: const Color(0xFF2A1C3F),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF7B3FA0), width: 0.8),
+                  ),
+                  child: Text("STATÜ: $_status", style: const TextStyle(color: Color(0xFFFF8FA3), fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+          // Sohbet Alanı
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: _chatHistory.length,
+              itemBuilder: (context, index) {
+                final item = _chatHistory[index];
+                final isUser = item["sender"] == "user";
+                return Align(
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.all(14),
+                    constraints: const BoxConstraints(maxWidth: 290),
+                    decoration: BoxDecoration(
+                      color: isUser ? const Color(0xFF4A1E35) : const Color(0xFF1C162D),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isUser ? const Color(0xFFFF6584) : const Color(0xFF7B3FA0),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isUser ? "SEN" : "AURA 🔥",
+                          style: TextStyle(color: isUser ? const Color(0xFFFF8FA3) : const Color(0xFFC084FC), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(item["text"]!, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4)),
+                      ],
                     ),
                   ),
-                  child: Text(
-                    msg["text"] ?? "",
-                    style: TextStyle(
-                      color: isUser ? Colors.white : const Color(0xFFA855F7),
-                      fontFamily: 'monospace',
+                );
+              },
+            ),
+          ),
+          // Seçenek Butonları Paneli
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF13101E),
+              border: Border(top: BorderSide(color: Color(0xFF2E2142))),
+            ),
+            child: Column(
+              children: _currentOptions.map((opt) {
+                return Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF241A38),
+                      foregroundColor: const Color(0xFFFF8FA3),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      side: const BorderSide(color: Color(0xFF7B3FA0), width: 1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
                     ),
+                    onPressed: () => _makeChoice(opt),
+                    child: Text(opt["text"], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
                   ),
-                ),
-              );
-            },
+                );
+              }).toList(),
+            ),
           ),
-        ),
-        if (_isLoading) const LinearProgressIndicator(color: Color(0xFFC084FC)),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: const Color(0xFF13111C),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
-                  decoration: const InputDecoration(
-                    hintText: "Komut girin...",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: _sendMessage,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.send, color: Color(0xFFC084FC)),
-                onPressed: () => _sendMessage(_controller.text),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class ImageStudioScreen extends StatefulWidget {
-  const ImageStudioScreen({super.key});
-
-  @override
-  State<ImageStudioScreen> createState() => _ImageStudioScreenState();
-}
-
-class _ImageStudioScreenState extends State<ImageStudioScreen> {
-  final TextEditingController _promptController = TextEditingController();
-  String? _imageUrl;
-  bool _isGenerating = false;
-
-  void _generateImage() async {
-    final prompt = _promptController.text.trim();
-    if (prompt.isEmpty) return;
-
-    setState(() {
-      _isGenerating = true;
-      _imageUrl = null;
-    });
-
-    final encoded = Uri.encodeComponent(prompt);
-    final url = "https://pollinations.ai/p/$encoded?width=512&height=512&seed=42&nologo=true";
-
-    setState(() {
-      _imageUrl = url;
-      _isGenerating = false;
-    });
-  }
+class GiftShopScreen extends StatelessWidget {
+  const GiftShopScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          TextField(
-            controller: _promptController,
-            style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
-            decoration: InputDecoration(
-              labelText: "Görsel Prompt",
-              labelStyle: const TextStyle(color: Color(0xFFA855F7)),
-              filled: true,
-              fillColor: const Color(0xFF13111C),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF3B2063)),
+    final List<Map<String, String>> gifts = [
+      {"name": "🌹 Kırmızı Gül", "desc": "Romantik bir dokunuş (+10 Puan)"},
+      {"name": "☕ Sıcak Kahve", "desc": "Samimi bir başlangıç (+5 Puan)"},
+      {"name": "🍫 Çikolata Kutusu", "desc": "Tatlı bir jest (+15 Puan)"},
+      {"name": "💍 Özel Kolye", "desc": "Unutulmaz bir hediye (+30 Puan)"},
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('🎁 HEDİYE MAĞAZASI', style: TextStyle(fontSize: 13, color: Color(0xFFFF6584), fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        backgroundColor: const Color(0xFF13101E),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: gifts.length,
+        itemBuilder: (context, index) {
+          final gift = gifts[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF171328),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF32254B)),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              title: Text(gift["name"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+              subtitle: Text(gift["desc"]!, style: const TextStyle(color: Color(0xFFFF8FA3), fontSize: 11)),
+              trailing: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6584),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("${gift["name"]} AURA'ya gönderildi! 💕"),
+                      backgroundColor: const Color(0xFF2A1C3F),
+                    ),
+                  );
+                },
+                child: const Text("Gönder", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1A102F),
-                foregroundColor: const Color(0xFFC084FC),
-                side: const BorderSide(color: Color(0xFF7E22CE)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: _isGenerating ? null : _generateImage,
-              child: const Text("GÖRSEL ÜRET", style: TextStyle(fontFamily: 'monospace')),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class PhotoAlbumScreen extends StatelessWidget {
+  const PhotoAlbumScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('📸 ÖZEL ANI ALBÜMÜ', style: TextStyle(fontSize: 13, color: Color(0xFFFF6584), fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        backgroundColor: const Color(0xFF13101E),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: GridView.count(
+        crossAxisCount: 2,
+        padding: const EdgeInsets.all(12),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        children: List.generate(4, (index) {
+          return Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF171328),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF7B3FA0), width: 1),
             ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: Center(
-              child: _isGenerating
-                  ? const CircularProgressIndicator(color: Color(0xFFC084FC))
-                  : _imageUrl != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            _imageUrl!,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const CircularProgressIndicator(color: Color(0xFFC084FC));
-                            },
-                          ),
-                        )
-                      : const Text("Henüz bir görsel üretilmedi.", style: TextStyle(color: Colors.grey)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_rounded, color: Color(0xFFFF8FA3), size: 36),
+                const SizedBox(height: 10),
+                Text("Özel Anı #${index + 1}", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                const Text("(Seviye 80+ Kilitli)", style: TextStyle(color: Colors.grey, fontSize: 10)),
+              ],
             ),
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
